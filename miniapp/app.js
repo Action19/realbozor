@@ -3,7 +3,7 @@
 // API_URL Render ga deploy qilingandan keyin o'zgartiriladi
 // ================================
 
-const API_URL = window.REALBOZOR_API_URL || "https://realbozor-api.onrender.com";
+const API_URL = window.REALBOZOR_API_URL || "https://realbozor.onrender.com";
 
 // ================================
 // TELEGRAM MINI APP INIT
