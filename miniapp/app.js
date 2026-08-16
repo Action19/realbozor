@@ -193,7 +193,7 @@ async function openProductModal(productId) {
 
 function fillModal(product) {
   const categoryLabels = {
-    bags: "👜 Ayollar sumkalari",
+    bags: "👜 Sumkalar",
     accessories: "💍 Aksessuarlar",
     clothes: "👗 Kiyimlar",
     gifts: "🎁 Sovg'alar",

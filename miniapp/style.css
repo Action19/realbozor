@@ -152,11 +152,11 @@ body {
 
 .category-chip {
   flex-shrink: 0;
-  padding: 6px 16px;
+  padding: 5px 12px;
   border-radius: 20px;
   border: 1.5px solid var(--border);
   background: white;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-muted);
   cursor: pointer;

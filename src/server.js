@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 // ================================
 
 const CATEGORIES = [
-  { id: "bags", label: "Ayollar sumkalari", icon: "👜" },
+  { id: "bags", label: "Sumkalar", icon: "👜" },
   { id: "accessories", label: "Aksessuarlar", icon: "💍" },
   { id: "clothes", label: "Kiyimlar", icon: "👗" },
   { id: "gifts", label: "Sovg'alar", icon: "🎁" },

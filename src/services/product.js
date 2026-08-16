@@ -2,7 +2,7 @@ const { Product } = require("../models/Product");
 
 // Kategoriyalar ro'yxati — sabit (keyinchalik DB dan olish mumkin)
 const CATEGORIES = [
-  { id: "bags", label: "👜 Ayollar sumkalari" },
+  { id: "bags", label: "👜 Sumkalar" },
   { id: "accessories", label: "💍 Aksessuarlar" },
   { id: "clothes", label: "👗 Kiyimlar" },
   { id: "gifts", label: "🎁 Sovg'alar" },
