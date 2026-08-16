@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RealBozor</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo">
+          <span class="logo-icon">🛍</span>
+          <div>
+            <div class="logo-title">RealBozor</div>
+            <div class="logo-slogan">Bozordagidek savdolash!</div>
+          </div>
+        </div>
+        <button class="cart-btn" id="cartBtn">
+          🛒
+          <span class="cart-count" id="cartCount">0</span>
+        </button>
+      </div>
+
+      <!-- Qidiruv -->
+      <div class="search-wrap">
+        <input
+          type="text"
+          class="search-input"
+          id="searchInput"
+          placeholder="🔎 Mahsulot qidirish..."
+        />
+      </div>
+    </header>
+
+    <!-- ===== KATEGORIYALAR ===== -->
+    <section class="categories-section">
+      <div class="categories-scroll" id="categoriesScroll">
+        <button class="category-chip active" data-id="all">🛍 Barchasi</button>
+        <!-- JS tomonidan qo'shiladi -->
+      </div>
+    </section>
+
+    <!-- ===== MAHSULOTLAR GRID ===== -->
+    <main class="main">
+      <!-- Loading -->
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Mahsulotlar yuklanmoqda...</p>
+      </div>
+
+      <!-- Bo'sh holat -->
+      <div class="empty" id="empty" style="display:none">
+        <div class="empty-icon">📦</div>
+        <p>Bu kategoriyada mahsulotlar mavjud emas</p>
+      </div>
+
+      <!-- Mahsulotlar -->
+      <div class="products-grid" id="productsGrid"></div>
+    </main>
+
+    <!-- ===== MAHSULOT MODAL ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal" id="productModal">
+        <button class="modal-close" id="modalClose">✕</button>
+
+        <div class="modal-image-wrap">
+          <img class="modal-image" id="modalImage" src="" alt="" />
+          <div class="modal-image-placeholder" id="modalImagePlaceholder">🛍</div>
+        </div>
+
+        <div class="modal-body">
+          <div class="modal-category" id="modalCategory"></div>
+          <h2 class="modal-title" id="modalTitle"></h2>
+
+          <div class="modal-price-row">
+            <span class="modal-price" id="modalPrice"></span>
+            <span class="modal-stock" id="modalStock"></span>
+          </div>
+
+          <p class="modal-desc" id="modalDesc"></p>
+
+          <div class="modal-delivery">
+            <div class="delivery-item">
+              <span>🚚 Kargo:</span>
+              <span id="modalCargo"></span>
+            </div>
+            <div class="delivery-item">
+              <span>⏱ Yetkazish:</span>
+              <span id="modalDelivery"></span>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-negotiate" id="btnNegotiate">
+              🤝 Savdolashish
+            </button>
+            <button class="btn-cart" id="btnCart">
+              🛒 Savatchaga
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PASTKI NAVIGATSIYA ===== -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-page="home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Bosh</span>
+      </button>
+      <button class="nav-btn" data-page="search">
+        <span class="nav-icon">🔎</span>
+        <span class="nav-label">Qidiruv</span>
+      </button>
+      <button class="nav-btn" data-page="favorites">
+        <span class="nav-icon">❤️</span>
+        <span class="nav-label">Sevimli</span>
+      </button>
+      <button class="nav-btn" data-page="cart">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-label">Savatcha</span>
+      </button>
+      <button class="nav-btn" data-page="profile">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profil</span>
+      </button>
+    </nav>
+
+    <script src="app.js"></script>
+  </body>
+</html>

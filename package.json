@@ -1,0 +1,21 @@
+{
+  "name": "realbozor",
+  "version": "1.0.0",
+  "description": "RealBozor - Telegram ichida bozordagidek savdolash!",
+  "main": "src/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/main.js",
+    "dev": "node --watch src/main.js",
+    "seed": "node src/scripts/seedProducts.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "grammy": "^1.45.1",
+    "mongoose": "^9.9.2"
+  }
+}
