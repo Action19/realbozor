@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
 
-    // Qo'shimcha ma'lumotlar (keyinchalik to'ldiriladi)
+    // Qo'shimcha ma'lumotlar
     phone: {
       type: String,
       default: "",
@@ -35,14 +35,28 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
 
-    // Foydalanuvchi holati
+    // Rol: buyer (xaridor), seller (sotuvchi), admin
+    role: {
+      type: String,
+      enum: ["buyer", "seller", "admin"],
+      default: "buyer",
+    },
+
+    // Agar sotuvchi bo'lsa — Seller ID
+    sellerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Seller",
+      default: null,
+    },
+
+    // Bloklash
     isBlocked: {
       type: Boolean,
       default: false,
     },
   },
   {
-    timestamps: true, // createdAt va updatedAt avtomatik qo'shiladi
+    timestamps: true,
   }
 );
 

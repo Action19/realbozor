@@ -2,6 +2,18 @@ const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema(
   {
+    // Sotuvchi
+    sellerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Seller",
+      required: true,
+    },
+
+    sellerTelegramId: {
+      type: Number,
+      required: true,
+    },
+
     name: {
       type: String,
       required: true,
@@ -47,6 +59,22 @@ const productSchema = new mongoose.Schema(
     deliveryDays: {
       type: String,
       default: "2-3 ish kuni",
+    },
+
+    // Mahsulot holati
+    // pending  — admin tekshirayapti
+    // active   — tasdiqlangan, ko'rinadi
+    // blocked  — admin bloklagan
+    // rejected — rad etilgan
+    status: {
+      type: String,
+      enum: ["pending", "active", "blocked", "rejected"],
+      default: "pending",
+    },
+
+    rejectReason: {
+      type: String,
+      default: "",
     },
 
     isActive: {
