@@ -39,7 +39,11 @@ const CATEGORIES = [
 
 // Sog'liq tekshiruvi
 app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", message: "RealBozor API ishlayapti" });
+  res.json({
+    status: "ok",
+    message: "RealBozor API ishlayapti",
+    adminSet: !!process.env.ADMIN_TELEGRAM_ID,
+  });
 });
 
 // Barcha kategoriyalar
