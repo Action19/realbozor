@@ -282,29 +282,29 @@ function closeModal() {
 document.getElementById("btnNegotiate").addEventListener("click", () => {
   if (!currentProduct) return;
 
-  try {
-    if (tg && tg.sendData) {
-      tg.sendData(
-        JSON.stringify({
-          action: "negotiate",
-          productId: currentProduct._id,
-          productName: currentProduct.name,
-        })
-      );
-    } else {
-      // Mini App bot orqali ochilmagan — to'g'ridan bot ga yo'naltirish
-      const botUrl = `https://t.me/realbozor_bot?start=negotiate_${currentProduct._id}`;
-      window.open(botUrl, "_blank");
-    }
-  } catch (err) {
-    console.error("sendData xatosi:", err);
-    // Fallback — bot ga o'tish
-    const botUrl = `https://t.me/realbozor_bot?start=negotiate_${currentProduct._id}`;
-    if (tg) {
-      tg.openTelegramLink(botUrl);
-    } else {
-      window.open(botUrl, "_blank");
-    }
+  const productId = currentProduct._id;
+  const productName = currentProduct.name;
+
+  if (tg) {
+    // Telegram MainButton orqali
+    tg.MainButton.setText(`🤝 ${productName} bilan savdolash`);
+    tg.MainButton.show();
+    tg.MainButton.onClick(() => {
+      tg.MainButton.hide();
+      // sendData bot ga yuboradi
+      tg.sendData(JSON.stringify({
+        action: "negotiate",
+        productId: productId,
+        productName: productName,
+      }));
+    });
+
+    // Yoki tg.close() bilan yopib, foydalanuvchi botga qaytadi
+    // va /start negotiate_ID yuborish kerak bo'ladi
+    // Hozircha sendData ishlamasligi uchun to'g'ridan bot linkini ochamiz
+    tg.openLink(`https://t.me/realbozor_bot?start=negotiate_${productId}`);
+  } else {
+    window.location.href = `https://t.me/realbozor_bot?start=negotiate_${productId}`;
   }
 
   closeModal();
