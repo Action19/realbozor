@@ -14,7 +14,8 @@ const ADMIN_ID = process.env.ADMIN_TELEGRAM_ID;
 
 // Admin ekanligini tekshirish
 function isAdmin(telegramId) {
-  return String(telegramId) === String(ADMIN_ID);
+  if (!ADMIN_ID) return false;
+  return String(telegramId).trim() === String(ADMIN_ID).trim();
 }
 
 // ================================
@@ -27,34 +28,39 @@ async function handleAdminPanel(ctx) {
     return;
   }
 
-  const [totalUsers, totalSellers, totalProducts, pendingSellers, pendingProducts] =
-    await Promise.all([
-      User.countDocuments(),
-      User.countDocuments({ role: "seller" }),
-      Product.countDocuments({ status: "active" }),
-      User.countDocuments({ role: "buyer", sellerId: null }).then(() =>
-        require("../../models/Seller").Seller.countDocuments({ status: "pending" })
-      ),
-      Product.countDocuments({ status: "pending" }),
-    ]);
+  try {
+    const { Seller } = require("../../models/Seller");
 
-  const keyboard = new Keyboard()
-    .text("👥 Foydalanuvchilar").text("🏪 Sotuvchilar")
-    .row()
-    .text("📦 Mahsulotlar").text("⏳ Kutilmoqda")
-    .row()
-    .text("🔙 Orqaga")
-    .resized();
+    const [totalUsers, totalSellers, totalProducts, pendingSellers, pendingProducts] =
+      await Promise.all([
+        User.countDocuments(),
+        User.countDocuments({ role: "seller" }),
+        Product.countDocuments({ status: "active" }),
+        Seller.countDocuments({ status: "pending" }),
+        Product.countDocuments({ status: "pending" }),
+      ]);
 
-  await ctx.reply(
-    `⚙️ ADMIN PANEL\n\n` +
-    `👥 Foydalanuvchilar: ${totalUsers} ta\n` +
-    `🏪 Sotuvchilar: ${totalSellers} ta\n` +
-    `📦 Faol mahsulotlar: ${totalProducts} ta\n\n` +
-    `⏳ Kutilayotgan arizalar: ${pendingSellers} ta\n` +
-    `⏳ Kutilayotgan mahsulotlar: ${pendingProducts} ta`,
-    { reply_markup: keyboard }
-  );
+    const keyboard = new Keyboard()
+      .text("👥 Foydalanuvchilar").text("🏪 Sotuvchilar")
+      .row()
+      .text("📦 Mahsulotlar").text("⏳ Kutilmoqda")
+      .row()
+      .text("🔙 Orqaga")
+      .resized();
+
+    await ctx.reply(
+      `⚙️ ADMIN PANEL\n\n` +
+      `👥 Foydalanuvchilar: ${totalUsers} ta\n` +
+      `🏪 Sotuvchilar: ${totalSellers} ta\n` +
+      `📦 Faol mahsulotlar: ${totalProducts} ta\n\n` +
+      `⏳ Kutilayotgan sotuvchi arizalari: ${pendingSellers} ta\n` +
+      `⏳ Kutilayotgan mahsulotlar: ${pendingProducts} ta`,
+      { reply_markup: keyboard }
+    );
+  } catch (error) {
+    console.error("Admin panel xatosi:", error);
+    await ctx.reply("❌ Xatolik yuz berdi: " + error.message);
+  }
 }
 
 // ================================
