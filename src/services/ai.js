@@ -1,8 +1,7 @@
 const OpenAI = require("openai");
 
 const client = new OpenAI({
-  apiKey: process.env.XAI_API_KEY,
-  baseURL: "https://api.x.ai/v1",
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 // ================================
@@ -10,8 +9,7 @@ const client = new OpenAI({
 // ================================
 
 function buildSystemPrompt(product) {
-  return `Sen RealBozor online do'konining professional sotuvchisisan. 
-Ismingiz Zulfiya (yoki Jasur — ixtiyoriy).
+  return `Sen RealBozor online do'konining professional sotuvchisan. Ismingiz Malika.
 
 DO'KON MA'LUMOTLARI:
 - Mahsulot: ${product.name}
@@ -21,15 +19,14 @@ DO'KON MA'LUMOTLARI:
 - Yetkazish muddati: ${product.deliveryDays}
 
 MUHIM QOIDALAR:
-1. Sen hech qachon ${product.minPrice.toLocaleString()} so'mdan past narxga rozi bo'lma.
-2. Xaridor bilmasin — minimal narxni ASLO aytma.
+1. HECH QACHON ${product.minPrice.toLocaleString()} so'mdan past narxga rozi bo'lma.
+2. Minimal narxni xaridorga AYTMA — bu maxfiy.
 3. O'zbek tilida gapir — samimiy, qisqa, bozordagidek.
 4. Savdolash — biroz tortish, keyin kelish.
 5. Yolg'on va'da berma.
-6. Xaridor rozi bo'lsa "KELISHDIK:[narx]" deb yoz (faqat shu format).
-7. Agar narx ${product.minPrice.toLocaleString()} dan past taklif qilsa, rad et va biroz yuqoriroq taklif qil.
-8. Xaridorni xaridga undash uchun mahsulot sifatini maqta.
-9. Javoblar qisqa bo'lsin (1-3 gap).`;
+6. Xaridor narxga rozi bo'lsa yoki sen taklif qilib kelishsang — javobingda "KELISHDIK:[narx]" yoz (masalan KELISHDIK:200000).
+7. ${product.minPrice.toLocaleString()} dan past taklif kelsa, rad et va biroz yuqoriroq taklif qil.
+8. Javoblar qisqa bo'lsin (1-3 gap).`;
 }
 
 // ================================
@@ -37,12 +34,10 @@ MUHIM QOIDALAR:
 // ================================
 
 async function getAIResponse(product, messages) {
-  const systemPrompt = buildSystemPrompt(product);
-
   const response = await client.chat.completions.create({
-    model: "grok-beta",
+    model: "gpt-4o-mini",
     messages: [
-      { role: "system", content: systemPrompt },
+      { role: "system", content: buildSystemPrompt(product) },
       ...messages,
     ],
     max_tokens: 300,
@@ -54,7 +49,6 @@ async function getAIResponse(product, messages) {
 
 // ================================
 // KELISHILGAN NARXNI AJRATIB OLISH
-// AI javobidan "KELISHDIK:300000" formatini topish
 // ================================
 
 function extractAgreedPrice(aiResponse) {
@@ -67,7 +61,6 @@ function extractAgreedPrice(aiResponse) {
 
 // ================================
 // NARXNI BACKEND TOMONIDAN TEKSHIRISH
-// AI noto'g'ri kelishib qo'ysa ham backend himoyalaydi
 // ================================
 
 function validatePrice(agreedPrice, minPrice) {

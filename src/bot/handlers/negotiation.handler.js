@@ -121,7 +121,6 @@ async function handleNegotiationMessage(ctx, userState) {
       userState.delete(telegramId);
       return true;
     }
-
     // Kelishildi!
     if (result.agreed && result.finalPrice) {
       userState.delete(telegramId);
@@ -155,7 +154,7 @@ async function handleNegotiationMessage(ctx, userState) {
     await ctx.reply(`🛍 Sotuvchi: ${result.response}`);
 
   } catch (error) {
-    console.error("AI xatosi:", error.message);
+    console.error("AI xatosi tafsilot:", error.message, error.status, error.code);
     await ctx.reply(
       "⚠️ Sotuvchi hozir band. Biroz kutib qayta urinib ko'ring.",
     );
