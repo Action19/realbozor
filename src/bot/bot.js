@@ -97,6 +97,23 @@ bot.command("start", async (ctx) => {
     return;
   }
 
+  // Mini App yopilgandan keyin pending negotiation tekshirish
+  try {
+    const apiUrl = process.env.API_URL || `http://localhost:${process.env.PORT || 3000}`;
+    const res = await fetch(`${apiUrl}/api/pending-negotiate/${ctx.from.id}`);
+    const data = await res.json();
+    if (data.success && data.productId) {
+      await ctx.reply(
+        `Assalomu alaykum, ${firstName}! 👋\n\nSavdolashish boshlanmoqda...`,
+        { reply_markup: mainKeyboard }
+      );
+      await handleStartNegotiation(ctx, data.productId, userState);
+      return;
+    }
+  } catch (e) {
+    // Pending yo'q — davom etamiz
+  }
+
   await ctx.reply(
     `🛍 REALBOZOR\nBozordagidek savdolash!\n\nAssalomu alaykum, ${firstName}! 👋\n\nRealBozorga xush kelibsiz.\n\nBu yerda siz:\n• mahsulotlarni ko'rishingiz\n• sotuvchi bilan savdolashishingiz\n• kelishilgan narxda xarid qilishingiz\n• buyurtmangizni kuzatishingiz mumkin.\n\nKerakli bo'limni tanlang 👇`,
     { reply_markup: mainKeyboard }

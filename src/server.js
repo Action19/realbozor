@@ -46,6 +46,28 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// Mini App dan savdolashish so'rovi saqlash
+const pendingNegotiations = new Map(); // telegramId → productId
+
+app.post("/api/pending-negotiate", (req, res) => {
+  const { telegramId, productId } = req.body;
+  if (!telegramId || !productId) {
+    return res.status(400).json({ success: false });
+  }
+  pendingNegotiations.set(String(telegramId), String(productId));
+  res.json({ success: true });
+});
+
+// Bot tomonidan o'qish
+app.get("/api/pending-negotiate/:telegramId", (req, res) => {
+  const productId = pendingNegotiations.get(req.params.telegramId);
+  if (productId) {
+    pendingNegotiations.delete(req.params.telegramId);
+    return res.json({ success: true, productId });
+  }
+  res.json({ success: false });
+});
+
 // Barcha kategoriyalar
 app.get("/api/categories", (req, res) => {
   res.json({ success: true, data: CATEGORIES });

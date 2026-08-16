@@ -279,35 +279,34 @@ function closeModal() {
 // SAVDOLASHISH — bot ga qaytish
 // ================================
 
-document.getElementById("btnNegotiate").addEventListener("click", () => {
+document.getElementById("btnNegotiate").addEventListener("click", async () => {
   if (!currentProduct) return;
 
   const productId = currentProduct._id;
   const productName = currentProduct.name;
 
-  if (tg) {
-    // Telegram MainButton orqali
-    tg.MainButton.setText(`🤝 ${productName} bilan savdolash`);
-    tg.MainButton.show();
-    tg.MainButton.onClick(() => {
-      tg.MainButton.hide();
-      // sendData bot ga yuboradi
-      tg.sendData(JSON.stringify({
-        action: "negotiate",
-        productId: productId,
-        productName: productName,
-      }));
-    });
+  closeModal();
 
-    // Yoki tg.close() bilan yopib, foydalanuvchi botga qaytadi
-    // va /start negotiate_ID yuborish kerak bo'ladi
-    // Hozircha sendData ishlamasligi uchun to'g'ridan bot linkini ochamiz
-    tg.openLink(`https://t.me/realbozor_bot?start=negotiate_${productId}`);
+  if (tg) {
+    // 1. API ga pending negotiation saqlash
+    try {
+      const userId = tg.initDataUnsafe?.user?.id;
+      if (userId) {
+        await fetch(`${API_URL}/api/pending-negotiate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ telegramId: userId, productId }),
+        });
+      }
+    } catch (e) {
+      console.error("Pending negotiate saqlashda xato:", e);
+    }
+
+    // 2. Mini App ni yopamiz — bot chatiga qaytadi
+    tg.close();
   } else {
     window.location.href = `https://t.me/realbozor_bot?start=negotiate_${productId}`;
   }
-
-  closeModal();
 });
 
 // ================================
