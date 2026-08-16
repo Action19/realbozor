@@ -287,16 +287,14 @@ document.getElementById("btnNegotiate").addEventListener("click", async () => {
 
   closeModal();
 
-  // sendData — faqat InlineKeyboard WebApp da ishlaydi
-  // Katalog tugmasi InlineKeyboard WebApp orqali ochilgani uchun ishlaydi
-  if (tg && tg.sendData) {
-    tg.sendData(JSON.stringify({
-      action: "negotiate",
-      productId: productId,
-      productName: productName,
-    }));
+  const botDeepLink = `https://t.me/realbozor_bot?start=negotiate_${productId}`;
+
+  if (tg) {
+    // openTelegramLink — Telegram ilovasida to'g'ridan-to'g'ri ochadi
+    // Mini App yopiladi va bot chatiga o'tadi
+    tg.openTelegramLink(botDeepLink);
   } else {
-    window.location.href = `https://t.me/realbozor_bot?start=negotiate_${productId}`;
+    window.location.href = botDeepLink;
   }
 });
 
