@@ -282,17 +282,29 @@ function closeModal() {
 document.getElementById("btnNegotiate").addEventListener("click", () => {
   if (!currentProduct) return;
 
-  // Telegram Mini App dan bot ga ma'lumot yuborish
-  if (tg) {
-    tg.sendData(
-      JSON.stringify({
-        action: "negotiate",
-        productId: currentProduct._id,
-        productName: currentProduct.name,
-      })
-    );
-  } else {
-    alert(`Savdolashish: ${currentProduct.name}`);
+  try {
+    if (tg && tg.sendData) {
+      tg.sendData(
+        JSON.stringify({
+          action: "negotiate",
+          productId: currentProduct._id,
+          productName: currentProduct.name,
+        })
+      );
+    } else {
+      // Mini App bot orqali ochilmagan — to'g'ridan bot ga yo'naltirish
+      const botUrl = `https://t.me/realbozor_bot?start=negotiate_${currentProduct._id}`;
+      window.open(botUrl, "_blank");
+    }
+  } catch (err) {
+    console.error("sendData xatosi:", err);
+    // Fallback — bot ga o'tish
+    const botUrl = `https://t.me/realbozor_bot?start=negotiate_${currentProduct._id}`;
+    if (tg) {
+      tg.openTelegramLink(botUrl);
+    } else {
+      window.open(botUrl, "_blank");
+    }
   }
 
   closeModal();

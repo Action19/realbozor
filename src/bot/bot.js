@@ -85,6 +85,18 @@ bot.command("start", async (ctx) => {
   await createOrUpdateUser(ctx.from);
   userState.delete(ctx.from.id);
 
+  // Mini App dan savdolashish so'rovi: /start negotiate_PRODUCTID
+  const param = ctx.match;
+  if (param && param.startsWith("negotiate_")) {
+    const productId = param.replace("negotiate_", "");
+    await ctx.reply(
+      `Assalomu alaykum, ${firstName}! 👋\n\nSavdolashish boshlanmoqda...`,
+      { reply_markup: mainKeyboard }
+    );
+    await handleStartNegotiation(ctx, productId, userState);
+    return;
+  }
+
   await ctx.reply(
     `🛍 REALBOZOR\nBozordagidek savdolash!\n\nAssalomu alaykum, ${firstName}! 👋\n\nRealBozorga xush kelibsiz.\n\nBu yerda siz:\n• mahsulotlarni ko'rishingiz\n• sotuvchi bilan savdolashishingiz\n• kelishilgan narxda xarid qilishingiz\n• buyurtmangizni kuzatishingiz mumkin.\n\nKerakli bo'limni tanlang 👇`,
     { reply_markup: mainKeyboard }
