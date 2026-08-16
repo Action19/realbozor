@@ -29,6 +29,12 @@ const {
   handleProductPhoto,
 } = require("./handlers/product.handler");
 const {
+  handleStartNegotiation,
+  handleNegotiationMessage,
+  handleOrderConfirm,
+  handleOrderCancel,
+} = require("./handlers/negotiation.handler");
+const {
   isAdmin,
   handleAdminPanel,
   handleAdminUsers,
@@ -294,8 +300,89 @@ bot.callbackQuery("back:catalog", async (ctx) => {
 
 // Savdolashish (bot chat)
 bot.callbackQuery(/^negotiate:(.+)$/, async (ctx) => {
+  const productId = ctx.match[1];
   await ctx.answerCallbackQuery();
-  await ctx.reply(`🤝 Savdolashish funksiyasi tez orada!\n\nHozircha kutib turing.`);
+  await handleStartNegotiation(ctx, productId, userState);
+});
+
+// Buyurtma tasdiqlash
+bot.callbackQuery(/^order:confirm:(.+)$/, async (ctx) => {
+  await handleOrderConfirm(ctx, userState);
+});
+
+// Buyurtma bekor qilish
+bot.callbackQuery(/^order:cancel:(.+)$/, async (ctx) => {
+  await handleOrderCancel(ctx, userState);
+});
+
+// Mavjud manzil bilan buyurtma berish
+bot.callbackQuery(/^order:place:(.+)$/, async (ctx) => {
+  const negotiationId = ctx.match[1];
+  await ctx.answerCallbackQuery();
+
+  const user = await getUserByTelegramId(ctx.from.id);
+  const { Negotiation } = require("../models/Negotiation");
+  const { Product } = require("../models/Product");
+
+  const negotiation = await Negotiation.findById(negotiationId);
+  const product = await Product.findById(negotiation.productId);
+
+  const totalPrice = negotiation.finalPrice + product.cargoPrice;
+
+  const keyboard = new InlineKeyboard()
+    .text("💳 To'lov qilish", `payment:${negotiationId}`)
+    .row()
+    .text("❌ Bekor qilish", `order:cancel:${negotiationId}`);
+
+  await ctx.reply(
+    `📦 BUYURTMA TAFSILOTLARI\n\n` +
+    `Mahsulot: ${product.name}\n` +
+    `Narx: ${formatPrice(negotiation.finalPrice)}\n` +
+    `Kargo: ${formatPrice(product.cargoPrice)}\n` +
+    `💵 JAMI: ${formatPrice(totalPrice)}\n\n` +
+    `📍 Manzil: ${user.address}\n` +
+    `📱 Telefon: ${user.phone}\n\n` +
+    `To'lovni amalga oshiring:`,
+    { reply_markup: keyboard }
+  );
+});
+
+// Yangi manzil kiritish
+bot.callbackQuery(/^order:new_address:(.+)$/, async (ctx) => {
+  const negotiationId = ctx.match[1];
+  await ctx.answerCallbackQuery();
+
+  userState.set(ctx.from.id, {
+    step: "order:address",
+    negotiationId,
+  });
+
+  await ctx.reply(
+    `📍 Yangi manzilni kiriting:\n\nMasalan:\nToshkent shahri, Chilonzor tumani, 12-uy`,
+    { reply_markup: new Keyboard().text("🔙 Orqaga").resized() }
+  );
+});
+
+// To'lov
+bot.callbackQuery(/^payment:(.+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+
+  const { Negotiation } = require("../models/Negotiation");
+  const { Product } = require("../models/Product");
+
+  const negotiation = await Negotiation.findById(ctx.match[1]);
+  const product = await Product.findById(negotiation.productId);
+  const totalPrice = negotiation.finalPrice + product.cargoPrice;
+
+  await ctx.reply(
+    `💳 TO'LOV\n\n` +
+    `Jami summa: ${formatPrice(totalPrice)}\n\n` +
+    `Karta raqami:\n` +
+    `<b>8600 0000 0000 0000</b>\n\n` +
+    `To'lov qilgandan so'ng chekni yuboring.\n` +
+    `Buyurtmangiz ${product.deliveryDays} ichida yetkaziladi.`,
+    { parse_mode: "HTML" }
+  );
 });
 
 bot.callbackQuery(/^cart:(.+)$/, async (ctx) => {
@@ -345,11 +432,8 @@ bot.callbackQuery(/^admin:product:detail:(.+)$/, async (ctx) => {
 bot.on("message:web_app_data", async (ctx) => {
   try {
     const data = JSON.parse(ctx.message.web_app_data.data);
-    if (data.action === "negotiate") {
-      await ctx.reply(
-        `🤝 Savdolashish boshlandi!\n\n📦 ${data.productName}\n\nAI sotuvchi tez orada qo'shiladi!`,
-        { reply_markup: mainKeyboard }
-      );
+    if (data.action === "negotiate" && data.productId) {
+      await handleStartNegotiation(ctx, data.productId, userState);
     }
   } catch (err) {
     console.error("web_app_data xatosi:", err);
@@ -420,6 +504,47 @@ bot.on("message:text", async (ctx) => {
   // Mahsulot qo'shish
   const productHandled = await handleProductRegistration(ctx, userState, bot);
   if (productHandled) return;
+
+  // Savdolashish
+  const negotiationHandled = await handleNegotiationMessage(ctx, userState);
+  if (negotiationHandled) return;
+
+  // Buyurtma manzil kiritish
+  if (state?.step === "order:address") {
+    if (text.length < 10) {
+      await ctx.reply("❌ Manzil juda qisqa. Aniqroq yozing.");
+      return;
+    }
+
+    await saveUserAddress(telegramId, text);
+
+    const { Negotiation } = require("../models/Negotiation");
+    const { Product } = require("../models/Product");
+    const negotiation = await Negotiation.findById(state.negotiationId);
+    const product = await Product.findById(negotiation.productId);
+    const user = await getUserByTelegramId(telegramId);
+    const totalPrice = negotiation.finalPrice + product.cargoPrice;
+
+    userState.delete(telegramId);
+
+    const keyboard = new InlineKeyboard()
+      .text("💳 To'lov qilish", `payment:${state.negotiationId}`)
+      .row()
+      .text("❌ Bekor qilish", `order:cancel:${state.negotiationId}`);
+
+    await ctx.reply(
+      `📦 BUYURTMA TAFSILOTLARI\n\n` +
+      `Mahsulot: ${product.name}\n` +
+      `Narx: ${formatPrice(negotiation.finalPrice)}\n` +
+      `Kargo: ${formatPrice(product.cargoPrice)}\n` +
+      `💵 JAMI: ${formatPrice(totalPrice)}\n\n` +
+      `📍 Manzil: ${text}\n` +
+      `📱 Telefon: ${user?.phone || "Kiritilmagan"}\n\n` +
+      `To'lovni amalga oshiring:`,
+      { reply_markup: keyboard }
+    );
+    return;
+  }
 
   await ctx.reply("Kerakli bo'limni tanlang 👇", { reply_markup: mainKeyboard });
 });
