@@ -128,7 +128,7 @@ bot.command("admin", async (ctx) => {
 });
 
 // ================================
-// KATALOG — Mini App
+// KATALOG — Mini App (InlineKeyboard WebApp tugmasi orqali)
 // ================================
 
 bot.hears("🛍 Katalog", async (ctx) => {
@@ -136,9 +136,10 @@ bot.hears("🛍 Katalog", async (ctx) => {
 
   const miniAppUrl = process.env.MINI_APP_URL;
   if (miniAppUrl) {
-    const keyboard = new InlineKeyboard().webApp("🛍 RealBozor Katalogni ochish", miniAppUrl);
+    // InlineKeyboard WebApp — sendData ishlashi uchun shu usul kerak
+    const keyboard = new InlineKeyboard().webApp("🛍 Katalogni ochish", miniAppUrl);
     await ctx.reply(
-      `🛍 REALBOZOR KATALOG\n\nTo'liq marketplace ni ochish uchun tugmani bosing:`,
+      `🛍 REALBOZOR KATALOG\n\nMahsulotlarni ko'rish va savdolashish uchun tugmani bosing:`,
       { reply_markup: keyboard }
     );
   } else {
@@ -462,10 +463,12 @@ bot.on("message:web_app_data", async (ctx) => {
   try {
     const data = JSON.parse(ctx.message.web_app_data.data);
     if (data.action === "negotiate" && data.productId) {
+      // sendData keldi — to'g'ridan-to'g'ri savdolashish boshlanadi
       await handleStartNegotiation(ctx, data.productId, userState);
     }
   } catch (err) {
     console.error("web_app_data xatosi:", err);
+    await ctx.reply("❌ Xatolik yuz berdi. Qayta urinib ko'ring.");
   }
 });
 

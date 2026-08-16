@@ -287,23 +287,14 @@ document.getElementById("btnNegotiate").addEventListener("click", async () => {
 
   closeModal();
 
-  if (tg) {
-    // 1. API ga pending negotiation saqlash
-    try {
-      const userId = tg.initDataUnsafe?.user?.id;
-      if (userId) {
-        await fetch(`${API_URL}/api/pending-negotiate`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ telegramId: userId, productId }),
-        });
-      }
-    } catch (e) {
-      console.error("Pending negotiate saqlashda xato:", e);
-    }
-
-    // 2. Mini App ni yopamiz — bot chatiga qaytadi
-    tg.close();
+  // sendData — faqat InlineKeyboard WebApp da ishlaydi
+  // Katalog tugmasi InlineKeyboard WebApp orqali ochilgani uchun ishlaydi
+  if (tg && tg.sendData) {
+    tg.sendData(JSON.stringify({
+      action: "negotiate",
+      productId: productId,
+      productName: productName,
+    }));
   } else {
     window.location.href = `https://t.me/realbozor_bot?start=negotiate_${productId}`;
   }
