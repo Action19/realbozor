@@ -75,7 +75,7 @@ async function handleStartNegotiation(ctx, productId, userState) {
   );
 
   // AI sotuvchining birinchi xabari
-  const firstMessage = `Assalomu alaykum! "${product.name}" mahsulotimizga qiziqish bildirganingiz uchun rahmat! 😊 Narxi ${formatPrice(product.price)}. Siz uchun qanday yordam bera olaman?`;
+  const firstMessage = `Savdolashamizmi? 😊\n\nHo'sh, ${product.name} uchun qancha berasiz? Boshlang'ich narximiz ${formatPrice(product.price)} — lekin gaplashib ko'ramiz!`;
 
   await ctx.reply(`🛍 Sotuvchi: ${firstMessage}`);
 }

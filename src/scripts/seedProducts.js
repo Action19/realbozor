@@ -3,11 +3,13 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const { Product } = require("../models/Product");
 
+// Admin Telegram ID ni seller sifatida ishlatamiz (test uchun)
+const ADMIN_TELEGRAM_ID = process.env.ADMIN_TELEGRAM_ID || "6148355322";
+
 const testProducts = [
   {
     name: "Elegant ayollar sumkasi",
-    description:
-      "Yuqori sifatli teri sumka. Ichida 3 ta bo'lim mavjud. Har qanday kiyim bilan mos keladi.",
+    description: "Yuqori sifatli teri sumka. Ichida 3 ta bo'lim mavjud. Har qanday kiyim bilan mos keladi.",
     category: "bags",
     price: 350000,
     minPrice: 280000,
@@ -15,12 +17,10 @@ const testProducts = [
     images: [],
     cargoPrice: 25000,
     deliveryDays: "2-3 ish kuni",
-    isActive: true,
   },
   {
     name: "Klass ko'cha sumkasi",
-    description:
-      "Zamonaviy dizayndagi katta hajmli sumka. Kundalik foydalanish uchun ideal.",
+    description: "Zamonaviy dizayndagi katta hajmli sumka. Kundalik foydalanish uchun ideal.",
     category: "bags",
     price: 220000,
     minPrice: 180000,
@@ -28,7 +28,6 @@ const testProducts = [
     images: [],
     cargoPrice: 25000,
     deliveryDays: "2-3 ish kuni",
-    isActive: true,
   },
   {
     name: "Oltin rang bilakuzuk",
@@ -40,7 +39,6 @@ const testProducts = [
     images: [],
     cargoPrice: 15000,
     deliveryDays: "2-3 ish kuni",
-    isActive: true,
   },
   {
     name: "Zanjirli marjon to'plam",
@@ -52,7 +50,6 @@ const testProducts = [
     images: [],
     cargoPrice: 15000,
     deliveryDays: "2-3 ish kuni",
-    isActive: true,
   },
   {
     name: "Yozgi ko'ylak",
@@ -64,26 +61,34 @@ const testProducts = [
     images: [],
     cargoPrice: 25000,
     deliveryDays: "2-3 ish kuni",
-    isActive: true,
   },
 ];
 
 async function seedProducts() {
   try {
-    const uri = process.env.MONGODB_URI;
-    await mongoose.connect(uri);
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log("🟢 MongoDB ga ulandi!");
 
-    // Mavjud test mahsulotlarni o'chirish
+    // Eski mahsulotlarni o'chirish
     await Product.deleteMany({});
     console.log("🗑  Eski mahsulotlar o'chirildi");
 
-    // Yangi mahsulotlar qo'shish
-    const inserted = await Product.insertMany(testProducts);
+    // Dummy sellerId (ObjectId) — test uchun
+    const dummySellerId = new mongoose.Types.ObjectId();
+
+    const productsWithDefaults = testProducts.map((p) => ({
+      ...p,
+      sellerId: dummySellerId,
+      sellerTelegramId: Number(ADMIN_TELEGRAM_ID),
+      status: "active",   // to'g'ridan-to'g'ri active
+      isActive: true,
+    }));
+
+    const inserted = await Product.insertMany(productsWithDefaults);
     console.log(`✅ ${inserted.length} ta mahsulot qo'shildi:\n`);
 
     inserted.forEach((p) => {
-      console.log(`  • ${p.name} — ${p.price.toLocaleString()} so'm (min: ${p.minPrice.toLocaleString()})`);
+      console.log(`  • ${p.name} — ${p.price.toLocaleString()} so'm | status: ${p.status}`);
     });
 
     await mongoose.disconnect();
