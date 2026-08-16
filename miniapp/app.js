@@ -33,15 +33,20 @@ let currentProduct = null;
 const loading = document.getElementById("loading");
 const empty = document.getElementById("empty");
 const productsGrid = document.getElementById("productsGrid");
-const categoriesScroll = document.getElementById("categoriesScroll");
 const searchInput = document.getElementById("searchInput");
 const modalOverlay = document.getElementById("modalOverlay");
 const modalClose = document.getElementById("modalClose");
 const cartCount = document.getElementById("cartCount");
 
 // ================================
-// KATEGORIYALAR
+// KATEGORIYALAR — DRAWER
 // ================================
+
+const categoriesMenuBtn = document.getElementById("categoriesMenuBtn");
+const drawerOverlay = document.getElementById("drawerOverlay");
+const drawerClose = document.getElementById("drawerClose");
+const drawerList = document.getElementById("drawerList");
+const activeCategoryLabel = document.getElementById("activeCategoryLabel");
 
 async function loadCategories() {
   try {
@@ -52,27 +57,58 @@ async function loadCategories() {
 
     json.data.forEach((cat) => {
       const btn = document.createElement("button");
-      btn.className = "category-chip";
+      btn.className = "drawer-item";
       btn.dataset.id = cat.id;
-      btn.textContent = `${cat.icon} ${cat.label}`;
-      btn.addEventListener("click", () => selectCategory(cat.id));
-      categoriesScroll.appendChild(btn);
+      btn.innerHTML = `
+        <span class="drawer-icon">${cat.icon}</span>
+        <span class="drawer-label">${cat.label}</span>
+        <span class="drawer-check" id="check-${cat.id}">✓</span>
+      `;
+      btn.addEventListener("click", () => {
+        selectCategory(cat.id, `${cat.icon} ${cat.label}`);
+        closeDrawer();
+      });
+      drawerList.appendChild(btn);
     });
   } catch (err) {
     console.error("Kategoriyalar yuklanmadi:", err);
   }
 }
 
-function selectCategory(categoryId) {
+function selectCategory(categoryId, label) {
   activeCategory = categoryId;
 
-  // Aktiv chip ni yangilash
-  document.querySelectorAll(".category-chip").forEach((btn) => {
+  // Aktiv holatni yangilash
+  document.querySelectorAll(".drawer-item").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.id === categoryId);
   });
 
+  // Label yangilash
+  activeCategoryLabel.textContent = label || "🛍 Barchasi";
+
   filterAndRender();
 }
+
+function openDrawer() {
+  drawerOverlay.classList.add("open");
+  tg?.HapticFeedback?.impactOccurred("light");
+}
+
+function closeDrawer() {
+  drawerOverlay.classList.remove("open");
+}
+
+categoriesMenuBtn.addEventListener("click", openDrawer);
+drawerClose.addEventListener("click", closeDrawer);
+drawerOverlay.addEventListener("click", (e) => {
+  if (e.target === drawerOverlay) closeDrawer();
+});
+
+// Barchasi tugmasi
+document.querySelector(".drawer-item[data-id='all']").addEventListener("click", () => {
+  selectCategory("all", "🛍 Barchasi");
+  closeDrawer();
+});
 
 // ================================
 // MAHSULOTLAR

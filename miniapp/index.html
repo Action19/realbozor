@@ -37,11 +37,32 @@
 
     <!-- ===== KATEGORIYALAR ===== -->
     <section class="categories-section">
-      <div class="categories-scroll" id="categoriesScroll">
-        <button class="category-chip active" data-id="all">🛍 Barchasi</button>
-        <!-- JS tomonidan qo'shiladi -->
+      <div class="categories-bar">
+        <div class="active-category-label" id="activeCategoryLabel">
+          🛍 Barchasi
+        </div>
+        <button class="categories-menu-btn" id="categoriesMenuBtn">
+          ☰ Kategoriyalar
+        </button>
       </div>
     </section>
+
+    <!-- ===== KATEGORIYALAR DRAWER ===== -->
+    <div class="drawer-overlay" id="drawerOverlay">
+      <div class="drawer" id="categoriesDrawer">
+        <div class="drawer-header">
+          <span class="drawer-title">📂 Kategoriyalar</span>
+          <button class="drawer-close" id="drawerClose">✕</button>
+        </div>
+        <div class="drawer-list" id="drawerList">
+          <button class="drawer-item active" data-id="all">
+            <span class="drawer-icon">🛍</span>
+            <span class="drawer-label">Barchasi</span>
+            <span class="drawer-check" id="check-all">✓</span>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- ===== MAHSULOTLAR GRID ===== -->
     <main class="main">
