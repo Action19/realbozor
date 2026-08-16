@@ -489,15 +489,28 @@ bot.on("message:text", async (ctx) => {
   const text = ctx.message.text.trim();
   const state = userState.get(telegramId);
 
-  if (!state) {
-    await ctx.reply("Kerakli bo'limni tanlang 👇", { reply_markup: mainKeyboard });
-    return;
-  }
-
-  // Orqaga tugmasi
+  // Orqaga tugmasi — har doim ishlaydi
   if (text === "🔙 Orqaga") {
     userState.delete(telegramId);
     await ctx.reply("Asosiy menyu 👇", { reply_markup: mainKeyboard });
+    return;
+  }
+
+  // State yo'q bo'lsa — pending negotiate tekshirish
+  if (!state) {
+    try {
+      const apiUrl = process.env.API_URL || `http://localhost:${process.env.PORT || 3000}`;
+      const res = await fetch(`${apiUrl}/api/pending-negotiate/${telegramId}`);
+      const data = await res.json();
+      if (data.success && data.productId) {
+        await handleStartNegotiation(ctx, data.productId, userState);
+        return;
+      }
+    } catch (e) {
+      // Pending yo'q
+    }
+
+    await ctx.reply("Kerakli bo'limni tanlang 👇", { reply_markup: mainKeyboard });
     return;
   }
 
