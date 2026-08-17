@@ -283,16 +283,18 @@ document.getElementById("btnNegotiate").addEventListener("click", async () => {
   if (!currentProduct) return;
 
   const productId = currentProduct._id;
-  const productName = currentProduct.name;
 
   closeModal();
 
   const botDeepLink = `https://t.me/realbozor_bot?start=negotiate_${productId}`;
 
   if (tg) {
-    // openTelegramLink — Telegram ilovasida to'g'ridan-to'g'ri ochadi
-    // Mini App yopiladi va bot chatiga o'tadi
-    tg.openTelegramLink(botDeepLink);
+    // Avval Mini App ni yopamiz
+    tg.close();
+    // Keyin bot ga o'tamiz — telefonda ham, kompyuterda ham ishlaydi
+    setTimeout(() => {
+      tg.openTelegramLink(botDeepLink);
+    }, 300);
   } else {
     window.location.href = botDeepLink;
   }
