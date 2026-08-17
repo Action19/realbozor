@@ -87,8 +87,11 @@ bot.command("start", async (ctx) => {
 
   // Mini App dan savdolashish so'rovi: /start negotiate_PRODUCTID
   const param = ctx.match;
+  console.log(`/start keldi. Param: "${param}" | User: ${ctx.from.id}`);
+
   if (param && param.startsWith("negotiate_")) {
     const productId = param.replace("negotiate_", "");
+    console.log(`Negotiate boshlandi. ProductId: ${productId}`);
     await ctx.reply(
       `Assalomu alaykum, ${firstName}! 👋\n\nSavdolashish boshlanmoqda...`,
       { reply_markup: mainKeyboard }

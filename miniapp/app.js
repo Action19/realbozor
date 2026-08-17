@@ -286,17 +286,14 @@ document.getElementById("btnNegotiate").addEventListener("click", async () => {
 
   closeModal();
 
-  const botDeepLink = `https://t.me/realbozor_bot?start=negotiate_${productId}`;
-
   if (tg) {
-    // Avval Mini App ni yopamiz
-    tg.close();
-    // Keyin bot ga o'tamiz — telefonda ham, kompyuterda ham ishlaydi
-    setTimeout(() => {
-      tg.openTelegramLink(botDeepLink);
-    }, 300);
+    // tg.openTelegramLink — Mini App ni yopib bot ga o'tkazadi
+    // start parametri bilan bot negotiate boshlaydi
+    tg.openTelegramLink(
+      `https://t.me/realbozor_bot?start=negotiate_${productId}`
+    );
   } else {
-    window.location.href = botDeepLink;
+    window.location.href = `https://t.me/realbozor_bot?start=negotiate_${productId}`;
   }
 });
 
